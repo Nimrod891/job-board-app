@@ -1,4 +1,5 @@
-import { Text } from "@chakra-ui/react";
+import { SimpleGrid, Text } from "@chakra-ui/react";
+import JobCard from "./JobCard";
 import useJobs from "../hooks/useJobs";
 
 const JobGrid = () => {
@@ -7,11 +8,15 @@ const JobGrid = () => {
   return (
     <>
       {error && <Text>{error}</Text>}
-      <ul>
+      <SimpleGrid
+        columns={{ sm: 1, md: 2, lg: 3, xl: 5 }}
+        padding="10px"
+        spacing={10}
+      >
         {jobs.map((job) => (
-          <li key={job.id}>{job.title}</li>
+          <JobCard key={job.id} job={job} />
         ))}
-      </ul>
+      </SimpleGrid>
     </>
   );
 };
