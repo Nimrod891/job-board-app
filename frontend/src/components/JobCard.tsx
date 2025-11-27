@@ -8,7 +8,7 @@ interface JobCardProps {
 
 const JobCard = ({ job }: JobCardProps) => {
   return (
-    <Card borderRadius={10} overflow="hidden">
+    <Card borderRadius={10} overflow="hidden" width="200px">
       <CardHeader>
         <Heading size="md">{job.title}</Heading>
       </CardHeader>
