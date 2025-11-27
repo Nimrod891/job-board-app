@@ -20,7 +20,7 @@ async function getJobById(req, res){
     const jobId = req.params.id;
 
     try {
-        const job = await jobsService.getJobwithRegistrations(jobId);
+        const job = await jobsService.getJobWithRegistrations(jobId);
 
         if(!job){
             // If service returns null the job doesn't exist
