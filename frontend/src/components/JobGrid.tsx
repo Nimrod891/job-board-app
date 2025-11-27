@@ -1,26 +1,9 @@
-import React, { useState, useEffect } from "react";
 import { Text } from "@chakra-ui/react";
-import apiClient from "../services/api-client";
-
-interface Job {
-  id: string;
-  title: string;
-}
-interface FetchJobsResponse {
-  count: number;
-  results: Job[];
-}
+import useJobs from "../hooks/useJobs";
 
 const JobGrid = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [error, setError] = useState("");
+  const { jobs, error } = useJobs();
 
-  useEffect(() => {
-    apiClient
-      .get<Job[]>("/jobs")
-      .then((res) => setJobs(res.data))
-      .catch((err) => setError(err.message));
-  }, []);
   return (
     <>
       {error && <Text>{error}</Text>}
