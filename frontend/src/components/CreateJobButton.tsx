@@ -20,10 +20,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import useCreateJob, { CreateJobInput } from "../hooks/useCreateJob";
-import { Job } from "../hooks/useJobs";
+import { JobSummary } from "../hooks/useJobs";
 
 interface CreateJobButtonProps {
-  onJobCreated: (job: Job) => void;
+  onJobCreated: (job: JobSummary) => void;
 }
 
 const formId = "create-job-form";

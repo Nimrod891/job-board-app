@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import apiClient from "../services/api-client";
 
-export interface Job {
+export interface JobSummary {
   id: string;
   title: string;
   company: string;
   location?: string;
   description?: string;
   created_at: string;
-  registrations: string[];
 }
 
 /**
@@ -16,7 +15,7 @@ export interface Job {
  * We default to 0 so existing consumers keep working without passing anything.
  */
 const useJobs = (refreshKey = 0) => {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<JobSummary[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +24,7 @@ const useJobs = (refreshKey = 0) => {
     setIsLoading(true);
 
     apiClient
-      .get<Job[]>("/jobs", { signal: controller.signal })
+      .get<JobSummary[]>("/jobs", { signal: controller.signal })
       .then((res) => setJobs(res.data))
       .catch((err) => {
         if (err.name === "CanceledError") return;

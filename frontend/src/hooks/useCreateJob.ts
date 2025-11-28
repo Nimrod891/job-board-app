@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
 import apiClient from "../services/api-client";
-import { Job } from "./useJobs";
+import { JobSummary } from "./useJobs";
 
 export interface CreateJobInput {
   title: string;
@@ -17,12 +17,12 @@ const useCreateJob = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const createJob = async (payload: CreateJobInput): Promise<Job> => {
+  const createJob = async (payload: CreateJobInput): Promise<JobSummary> => {
     setIsSubmitting(true);
     setError("");
 
     try {
-      const response = await apiClient.post<Job>("/jobs", payload);
+      const response = await apiClient.post<JobSummary>("/jobs", payload);
       return response.data;
     } catch (err) {
       const axiosError = err as AxiosError<{ error?: string }>;
