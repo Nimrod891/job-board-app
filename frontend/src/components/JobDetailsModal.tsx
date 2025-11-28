@@ -210,19 +210,28 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
                   Registrations
                 </Text>
                 {registrations.length > 0 ? (
-                  <List spacing={2}>
-                    {registrations.map((registration) => (
-                      <ListItem
-                        key={registration}
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                      >
-                        <ListIcon as={CheckCircleIcon} color="green.400" />
-                        <Text>{registration}</Text>
-                      </ListItem>
-                    ))}
-                  </List>
+                  <Box
+                    maxH={{ base: 32, md: 48 }}
+                    overflowY="auto"
+                    pr={2}
+                    borderRadius="md"
+                    borderWidth="1px"
+                    borderColor="whiteAlpha.200"
+                  >
+                    <List spacing={2}>
+                      {registrations.map((registration) => (
+                        <ListItem
+                          key={registration}
+                          display="flex"
+                          alignItems="center"
+                          gap={2}
+                        >
+                          <ListIcon as={CheckCircleIcon} color="green.400" />
+                          <Text>{registration}</Text>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
                 ) : (
                   <Text color="gray.500">
                     Nobody has registered for this role yet.
