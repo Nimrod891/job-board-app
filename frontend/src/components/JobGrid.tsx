@@ -3,8 +3,13 @@ import JobCard from "./JobCard";
 import useJobs from "../hooks/useJobs";
 import JobCardSkeleton from "./JobCardSkeleton";
 
-const JobGrid = () => {
-  const { jobs, error, isLoading } = useJobs();
+interface JobGridProps {
+  refreshKey?: number;
+}
+
+const JobGrid = ({ refreshKey = 0 }: JobGridProps) => {
+  // refreshKey is bumped by the parent whenever a new job gets created.
+  const { jobs, error, isLoading } = useJobs(refreshKey);
   const skeletons = [1, 2, 3, 4, 5];
 
   return (
@@ -12,7 +17,7 @@ const JobGrid = () => {
       {error && <Text>{error}</Text>}
       <SimpleGrid
         columns={{ sm: 1, md: 2, lg: 3, xl: 5 }}
-        padding="10px"
+        padding="20px"
         spacing={10}
       >
         {isLoading &&
