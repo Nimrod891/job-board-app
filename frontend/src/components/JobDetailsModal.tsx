@@ -44,33 +44,28 @@ interface JobDetailsModalProps {
  * - otherwise → locale date string
  */
 const formatPostedLabel = (createdAt: string) => {
-  /**
-   * Backend timestamps come from PostgreSQL which may serialize without a timezone.
-   * When that happens the browser assumes the string is already in the user's local
-   * timezone, which can make "just created" items look a few hours old.
-   * We detect the absence of a timezone suffix and treat those strings as UTC so
-   * everyone sees consistent relative times.
-   */
-  //const hasTimezone = /([zZ]|[+-]\d{2}:\d{2})$/.test(createdAt);
-  //const safeTimestamp = hasTimezone ? createdAt : `${createdAt}Z`;
-  const createdDate = new Date(createdAt);
+  const created = new Date(createdAt);
+  console.log(created);
+  console.log(createdAt); // Automatically converts from UTC → local TZ
   const now = new Date();
-  const diffMs = now.getTime() - createdDate.getTime();
-  const diffMinutes = Math.max(Math.floor(diffMs / 60000), 0);
 
-  if (diffMinutes < 5) return "just now";
-  if (diffMinutes < 60) {
-    const minuteLabel = diffMinutes === 1 ? "minute" : "minutes";
-    return `${diffMinutes} ${minuteLabel} ago`;
-  }
-
+  const diffMs = now.getTime() - created.getTime();
+  const diffSeconds = Math.max(Math.floor(diffMs / 1000), 0);
+  const diffMinutes = Math.floor(diffSeconds / 60);
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) {
-    const hourLabel = diffHours === 1 ? "hour" : "hours";
-    return `${diffHours} ${hourLabel} ago`;
-  }
 
-  return createdDate.toLocaleDateString();
+  if (diffSeconds < 60) return "just now";
+  if (diffMinutes < 60)
+    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+
+  // Fallback to local date string
+  return created.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
