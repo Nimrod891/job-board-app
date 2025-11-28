@@ -1,3 +1,4 @@
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import {
   Alert,
   AlertIcon,
@@ -6,6 +7,10 @@ import {
   Button,
   Center,
   Divider,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
   List,
   ListIcon,
   ListItem,
@@ -23,6 +28,7 @@ import {
 } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import useJob from "../hooks/useJob";
+import useRegisterForJob from "../hooks/useRegisterForJob";
 
 interface JobDetailsModalProps {
   jobId: string | null;
@@ -75,7 +81,65 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
    */
   const modalSize = useBreakpointValue({ base: "xs", md: "lg" });
 
-  const { job, error, isLoading } = useJob(jobId);
+  const { job, error, isLoading, refetch } = useJob(jobId);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const {
+    register: registerForJob,
+    isSubmitting: isRegistering,
+    error: registrationError,
+    wasSuccessful,
+    resetStatus,
+  } = useRegisterForJob();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setEmail("");
+      setEmailError("");
+      resetStatus();
+    }
+  }, [isOpen, resetStatus]);
+
+  useEffect(() => {
+    if (jobId) {
+      setEmail("");
+      setEmailError("");
+      resetStatus();
+    }
+  }, [jobId, resetStatus]);
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (emailError) setEmailError("");
+    if (registrationError || wasSuccessful) {
+      resetStatus();
+    }
+    setEmail(event.target.value);
+  };
+
+  const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!jobId) return;
+
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setEmailError("Please enter your email.");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(trimmed)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      await registerForJob(jobId, trimmed);
+      setEmail("");
+      refetch();
+    } catch {
+      // Handler in hook sets the appropriate error message.
+    }
+  };
 
   /**
    * If there is no selected job id we abort rendering so we never show stale data
@@ -164,6 +228,49 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
                     Nobody has registered for this role yet.
                   </Text>
                 )}
+              </Box>
+              <Divider />
+              <Box
+                as="form"
+                onSubmit={handleRegisterSubmit}
+                aria-label="Register for this job"
+              >
+                <Stack spacing={3}>
+                  <FormControl isInvalid={!!emailError}>
+                    <FormLabel>Email</FormLabel>
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={handleEmailChange}
+                      autoComplete="email"
+                    />
+                    {emailError && (
+                      <FormErrorMessage>{emailError}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                  {registrationError && (
+                    <Alert status="error" borderRadius="md">
+                      <AlertIcon />
+                      {registrationError}
+                    </Alert>
+                  )}
+                  {wasSuccessful && (
+                    <Alert status="success" borderRadius="md">
+                      <AlertIcon />
+                      You're registered for this role.
+                    </Alert>
+                  )}
+                  <Button
+                    type="submit"
+                    colorScheme="green"
+                    width="100%"
+                    isLoading={isRegistering}
+                    isDisabled={!job}
+                  >
+                    Register
+                  </Button>
+                </Stack>
               </Box>
             </Stack>
           )}

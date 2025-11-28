@@ -14,12 +14,16 @@ const useJob = (jobId: string | null) => {
   const [job, setJob] = useState<JobDetails | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshIndex, setRefreshIndex] = useState(0);
+
+  const refetch = () => setRefreshIndex((index) => index + 1);
 
   useEffect(() => {
     if (!jobId) {
       setJob(null);
       setError("");
       setIsLoading(false);
+      if (refreshIndex !== 0) setRefreshIndex(0);
       return;
     }
 
@@ -28,6 +32,7 @@ const useJob = (jobId: string | null) => {
     setError("");
     setJob(null);
 
+    // we don't use a promise here because inside useEffect we can't return a promise.
     apiClient
       .get<JobDetails>(`/jobs/${jobId}`, { signal: controller.signal })
       .then((response) => setJob(response.data))
@@ -38,9 +43,9 @@ const useJob = (jobId: string | null) => {
       .finally(() => setIsLoading(false));
 
     return () => controller.abort();
-  }, [jobId]);
+  }, [jobId, refreshIndex]);
 
-  return { job, error, isLoading };
+  return { job, error, isLoading, refetch };
 };
 
 export default useJob;
