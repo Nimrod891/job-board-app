@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 const jobsController = require('../controllers/jobs.controller');
+const requireAuth = require('../middleware/auth');
 
 // GET /jobs - list all jobs
 router.get("/", jobsController.getAllJobs);
@@ -12,8 +13,8 @@ router.get("/", jobsController.getAllJobs);
 // GET /jobs/:id - get a single job and its registrations
 router.get("/:id", jobsController.getJobById);
 
-// POST /jobs - create a new job
-router.post("/", jobsController.createJob);
+// POST /jobs - create a new job (requires auth so we know the owner)
+router.post("/", requireAuth, jobsController.createJob);
 
 // POST /jobs/:id/registrations - add a  registration email to a job
 router.post("/:id/registrations", jobsController.addRegistration);

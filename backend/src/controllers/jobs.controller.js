@@ -2,7 +2,6 @@
 // Handles HTTP requests/responses and delegates to the service layer.
 
 const jobsService = require('../services/jobs.service');
-const usersService = require('../services/users.service');
 
 // GET /jobs
 async function getAllJobs(req,res){
@@ -36,20 +35,17 @@ async function getJobById(req, res){
 
 // POST /jobs
 async function createJob(req, res){
-    const { title, company, location, description, ownerUserId } = req.body;
+    const { title, company, location, description } = req.body;
+    const ownerUserId = req.user?.id;
 
     // Basic validation according to API logic
     if (!title || !company) {
         return res.status(400).json({error: 'Job title and company name are required'});
     }
     if (!ownerUserId) {
-        return res.status(400).json({error: 'ownerUserId is required'});
+        return res.status(401).json({error: 'Authentication is required to create jobs'});
     }
     try {
-        const owner = await usersService.getUserById(ownerUserId);
-        if (!owner) {
-            return res.status(404).json({error: 'Owner user not found'});
-        }
         const newJob = await jobsService.createJob({
             title,
             company,

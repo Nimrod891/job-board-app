@@ -35,9 +35,25 @@ async function getUserById(userId) {
   return result.rows[0] || null;
 }
 
+/**
+ * Finds a user by email. Returns null when no match exists.
+ */
+async function getUserByEmail(email) {
+  const result = await db.query(
+    `
+    SELECT id, email, name, role, created_at
+    FROM users
+    WHERE email = $1
+    `,
+    [email]
+  );
+  return result.rows[0] || null;
+}
+
 module.exports = {
   createUser,
   getUserById,
+  getUserByEmail,
 };
 
 /*

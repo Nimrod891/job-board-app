@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const jobsRouter = require('./routes/jobs.routes');
 const usersRouter = require('./routes/users.routes');
+const authRouter = require('./routes/auth.routes');
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.get('/health', (req, res) => {
 app.use('/jobs', jobsRouter);
 // Mount the users routes
 app.use('/users', usersRouter);
+// Auth endpoints (signup/login)
+app.use('/auth', authRouter);
 
 module.exports = app;
 
