@@ -45,8 +45,6 @@ interface JobDetailsModalProps {
  */
 const formatPostedLabel = (createdAt: string) => {
   const created = new Date(createdAt);
-  console.log(created);
-  console.log(createdAt); // Automatically converts from UTC → local TZ
   const now = new Date();
 
   const diffMs = now.getTime() - created.getTime();

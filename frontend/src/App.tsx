@@ -4,10 +4,13 @@ import NavBar from "./components/NavBar";
 import JobGrid from "./components/JobGrid";
 import CreateJobButton from "./components/CreateJobButton";
 
+export interface JobQuery {
+  searchText: string;
+}
 function App() {
   // Whenever a job is created we increment this number so JobGrid knows to re-fetch.
   const [refreshKey, setRefreshKey] = useState(0);
-
+  const [jobQuery, setJobQuery] = useState<JobQuery>({ searchText: "" });
   const handleJobCreated = () => {
     setRefreshKey((current) => current + 1);
   };
@@ -20,7 +23,9 @@ function App() {
       }}
     >
       <GridItem area="nav">
-        <NavBar />
+        <NavBar
+          onSearch={(searchText) => setJobQuery({ ...jobQuery, searchText })}
+        />
       </GridItem>
       <Show above="lg">
         {/* The aside column is only visible on larger screens per the layout rules. */}
