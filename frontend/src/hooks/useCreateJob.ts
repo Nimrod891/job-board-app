@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AxiosError } from "axios";
 import apiClient from "../services/api-client";
 import { JobSummary } from "./useJobs";
+import { useAuth } from "../contexts/AuthContext";
 
 export interface CreateJobInput {
   title: string;
@@ -14,10 +15,17 @@ export interface CreateJobInput {
  * Encapsulates the POST /jobs call so components only worry about UI state.
  */
 const useCreateJob = () => {
+  const { token } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const createJob = async (payload: CreateJobInput): Promise<JobSummary> => {
+    if (!token) {
+      const message = "You must be logged in to create a job.";
+      setError(message);
+      throw new Error(message);
+    }
+
     setIsSubmitting(true);
     setError("");
 
