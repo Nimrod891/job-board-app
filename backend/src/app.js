@@ -4,6 +4,7 @@
 const express = require('express');
 const cors = require('cors');
 const jobsRouter = require('./routes/jobs.routes');
+const usersRouter = require('./routes/users.routes');
 
 const app = express();
 
@@ -23,6 +24,8 @@ app.get('/health', (req, res) => {
 
 // Mount the jobs routes
 app.use('/jobs', jobsRouter);
+// Mount the users routes
+app.use('/users', usersRouter);
 
 module.exports = app;
 

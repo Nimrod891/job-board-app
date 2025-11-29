@@ -7,7 +7,7 @@ const {randomUUID} = require('crypto');
 // Return all jobs (simple list, no registrations)
 async function getAllJobs(){
     const result = await db.query(
-        `SELECT id, title, company, location, description, created_at
+        `SELECT id, title, company, location, description, owner_user_id, created_at
         FROM jobs
         ORDER BY created_at DESC`
     );
@@ -19,7 +19,7 @@ async function getAllJobs(){
 async function getJobWithRegistrations(jobId){
     const jobResult = await db.query(
         `
-        SELECT id, title, company, location, description, created_at
+        SELECT id, title, company, location, description, owner_user_id, created_at
         FROM jobs
         WHERE id=$1
         `, [jobId]
@@ -49,16 +49,16 @@ async function getJobWithRegistrations(jobId){
 }
 
 // Create a new job in the database
-async function createJob({title, company, location, description}){
+async function createJob({title, company, location, description, ownerUserId}){
     const id = randomUUID();
 
     const result = await db.query(
         `
-        INSERT INTO jobs (id, title, company, location, description)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, title, company, location, description, created_at
+        INSERT INTO jobs (id, title, company, location, description, owner_user_id)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id, title, company, location, description, owner_user_id, created_at
         `,
-        [id, title, company, location || null, description || null]
+        [id, title, company, location || null, description || null, ownerUserId]
     );
 
     return result.rows[0];
