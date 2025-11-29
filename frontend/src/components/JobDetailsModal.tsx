@@ -25,10 +25,13 @@ import {
   Stack,
   Text,
   useBreakpointValue,
+  IconButton,
 } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, DeleteIcon } from "@chakra-ui/icons";
 import useJob from "../hooks/useJob";
 import useRegisterForJob from "../hooks/useRegisterForJob";
+import { useAuth } from "../contexts/AuthContext";
+import useDeleteRegistration from "../hooks/useDeleteRegistration";
 
 interface JobDetailsModalProps {
   jobId: string | null;
@@ -36,17 +39,8 @@ interface JobDetailsModalProps {
   onClose: () => void;
 }
 
-/**
- * Returns a human-friendly label for when the job was created.
- * - <5 minutes → "just now"
- * - <60 minutes → "X minutes ago"
- * - <24 hours → "X hours ago"
- * - otherwise → locale date string
- */
 const formatPostedLabel = (createdAt: string) => {
   const created = new Date(createdAt);
-  console.log(created);
-  console.log(createdAt); // Automatically converts from UTC → local TZ
   const now = new Date();
 
   const diffMs = now.getTime() - created.getTime();
@@ -77,6 +71,13 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
   const modalSize = useBreakpointValue({ base: "xs", md: "lg" });
 
   const { job, error, isLoading, refetch } = useJob(jobId);
+  const { user } = useAuth();
+  const {
+    remove: deleteRegistration,
+    isSubmitting: isDeleting,
+    error: deleteError,
+    resetStatus: resetDeleteStatus,
+  } = useDeleteRegistration();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const {
@@ -92,16 +93,18 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
       setEmail("");
       setEmailError("");
       resetStatus();
+      resetDeleteStatus();
     }
-  }, [isOpen, resetStatus]);
+  }, [isOpen, resetStatus, resetDeleteStatus]);
 
   useEffect(() => {
     if (jobId) {
       setEmail("");
       setEmailError("");
       resetStatus();
+      resetDeleteStatus();
     }
-  }, [jobId, resetStatus]);
+  }, [jobId, resetStatus, resetDeleteStatus]);
 
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (emailError) setEmailError("");
@@ -144,6 +147,7 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
 
   const postedLabel = job ? formatPostedLabel(job.created_at) : "";
   const registrations = job?.registrations ?? [];
+  const canManage = user && job?.owner_user_id === user.id;
 
   return (
     <Modal
@@ -220,9 +224,27 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
                           display="flex"
                           alignItems="center"
                           gap={2}
+                          justifyContent="space-between"
                         >
-                          <ListIcon as={CheckCircleIcon} color="green.400" />
-                          <Text>{registration}</Text>
+                          <Box display="flex" alignItems="center" gap={2}>
+                            <ListIcon as={CheckCircleIcon} color="green.400" />
+                            <Text>{registration}</Text>
+                          </Box>
+                          {canManage && (
+                            <IconButton
+                              aria-label={`Remove ${registration}`}
+                              icon={<DeleteIcon />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="red"
+                              isDisabled={isDeleting}
+                              onClick={() =>
+                                deleteRegistration(jobId, registration).then(
+                                  () => refetch()
+                                )
+                              }
+                            />
+                          )}
                         </ListItem>
                       ))}
                     </List>
@@ -274,6 +296,12 @@ const JobDetailsModal = ({ jobId, isOpen, onClose }: JobDetailsModalProps) => {
                   >
                     Register
                   </Button>
+                  {deleteError && (
+                    <Alert status="error" borderRadius="md">
+                      <AlertIcon />
+                      {deleteError}
+                    </Alert>
+                  )}
                 </Stack>
               </Box>
             </Stack>

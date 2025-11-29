@@ -8,6 +8,7 @@ export interface JobSummary {
   location?: string;
   description?: string;
   created_at: string;
+  owner_user_id: string;
 }
 
 /**
