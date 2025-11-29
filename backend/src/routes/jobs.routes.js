@@ -19,6 +19,9 @@ router.post("/", requireAuth, jobsController.createJob);
 // POST /jobs/:id/registrations - add a  registration email to a job
 router.post("/:id/registrations", jobsController.addRegistration);
 
+// DELETE /jobs/:id/registrations - owner removes a registration
+router.delete("/:id/registrations", requireAuth, jobsController.removeRegistration);
+
 module.exports = router;
 
  /* WHY THIS IS BETTER:

@@ -82,11 +82,43 @@ async function addRegistration(jobId, email){
     return "OK";
 }
 
+async function removeRegistration(jobId, email, requesterUserId){
+    const jobResult = await db.query(
+        'SELECT owner_user_id FROM jobs WHERE id = $1',
+        [jobId]
+    );
+
+    if (jobResult.rows.length === 0) {
+        return 'JOB_NOT_FOUND';
+    }
+
+    const { owner_user_id: ownerUserId } = jobResult.rows[0];
+    if (ownerUserId !== requesterUserId) {
+        return 'FORBIDDEN';
+    }
+
+    const deleteResult = await db.query(
+        `
+        DELETE FROM registrations
+        WHERE job_id = $1 AND email = $2
+        RETURNING id
+        `,
+        [jobId, email]
+    );
+
+    if (deleteResult.rowCount === 0) {
+        return 'REGISTRATION_NOT_FOUND';
+    }
+
+    return 'OK';
+}
+
 module.exports = {
     getAllJobs,
     getJobWithRegistrations,
     createJob,
     addRegistration,
+    removeRegistration,
 };
 /* WHY ITS BETTER:
  - If the DB changes( Postgres-> mySQL, new columns, joins),

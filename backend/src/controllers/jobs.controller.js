@@ -91,11 +91,48 @@ async function addRegistration(req, res){
     }
 }
 
+// DELETE /jobs/:id/registrations
+async function removeRegistration(req, res){
+    const jobId = req.params.id;
+    const { email } = req.body;
+    const ownerUserId = req.user?.id;
+
+    if (!ownerUserId) {
+        return res.status(401).json({error: 'Authentication is required'});
+    }
+
+    if (!email) {
+        return res.status(400).json({error: 'Email is required'});
+    }
+
+    try {
+        const result = await jobsService.removeRegistration(jobId, email, ownerUserId);
+
+        if (result === 'JOB_NOT_FOUND') {
+            return res.status(404).json({error: 'Job not found'});
+        }
+
+        if (result === 'FORBIDDEN') {
+            return res.status(403).json({error: 'Only the job owner can delete registrations'});
+        }
+
+        if (result === 'REGISTRATION_NOT_FOUND') {
+            return res.status(404).json({error: 'Registration not found for this job'});
+        }
+
+        res.json({success: true});
+    } catch (err) {
+        console.error("Error in removeRegistration:", err);
+        res.status(500).json({error: 'Internal server error'});
+    }
+}
+
 module.exports = {
     getAllJobs,
     getJobById,
     createJob,
     addRegistration,
+    removeRegistration,
 };
 /*WHY ITS BETTER:
  - Controllers only care about HTTP:
