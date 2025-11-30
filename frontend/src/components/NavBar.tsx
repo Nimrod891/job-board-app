@@ -1,4 +1,4 @@
-import { Flex, HStack, Image } from "@chakra-ui/react";
+import { Box, Flex, Image } from "@chakra-ui/react";
 import logo from "../assets/logo.webp";
 import ColorModeSwitch from "./ColorModeSwitch";
 import SearchInput from "./SearchInput";
@@ -11,18 +11,31 @@ interface NavBarProps {
 const NavBar = ({ searchText, onSearch }: NavBarProps) => {
   return (
     <Flex
-      direction={{ base: "column", md: "row" }}
-      gap={{ base: 3, md: 4 }}
-      align={{ base: "stretch", md: "center" }}
-      justify="space-between"
+      as="nav"
+      align="center"
+      gap={{ base: 3, md: 6 }}
       paddingX="10px"
       paddingY="8px"
+      width="100%"
     >
-      <HStack spacing={3}>
-        <Image src={logo} boxSize="60px" borderRadius={10} overflow="hidden" />
-      </HStack>
-      <SearchInput value={searchText} onSearch={onSearch} />
-      <ColorModeSwitch />
+      <Image
+        src={logo}
+        boxSize="52px"
+        borderRadius={10}
+        overflow="hidden"
+        flexShrink={0}
+      />
+      <Box
+        flex="1"
+        minWidth={0}
+        display="flex"
+        justifyContent={{ base: "flex-start", md: "center" }}
+      >
+        <SearchInput value={searchText} onSearch={onSearch} />
+      </Box>
+      <Box flexShrink={0}>
+        <ColorModeSwitch />
+      </Box>
     </Flex>
   );
 };

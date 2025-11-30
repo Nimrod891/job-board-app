@@ -12,7 +12,7 @@ const SearchInput = ({ value, onSearch }: SearchInputProps) => {
     onSearch(event.target.value);
 
   return (
-    <InputGroup maxW="480px" width="100%">
+    <InputGroup maxW={{ base: "100%", md: "480px" }} width="100%">
       <InputLeftElement pointerEvents="none" children={<BsSearch />} />
       <Input
         value={value}
