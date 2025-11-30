@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: jobapp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jobapp
+      POSTGRES_PASSWORD: jobapp
+      POSTGRES_DB: jobapp_jobs
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    # Seed is intentionally NOT wired automatically so it remains optional.
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jobapp-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://jobapp:jobapp@db:5432/jobapp_jobs
+      JWT_SECRET: "change-me-in-real-env"
+      JWT_TTL: "7d"
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jobapp-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: development
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres-data:
+
+
