@@ -11,6 +11,7 @@ function App() {
   const { user } = useAuth();
   // Whenever a job is created we increment this number so JobGrid knows to re-fetch.
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchText, setSearchText] = useState("");
 
   const handleJobCreated = () => {
     setRefreshKey((current) => current + 1);
@@ -23,8 +24,15 @@ function App() {
         lg: `"nav nav" "aside main"`, // 1024px and above
       }}
     >
-      <GridItem area="nav">
-        <NavBar />
+      <GridItem
+        area="nav"
+        position="sticky"
+        top={0}
+        zIndex={10}
+        bg="chakra-body-bg"
+        boxShadow="sm"
+      >
+        <NavBar searchText={searchText} onSearch={setSearchText} />
       </GridItem>
       <Show above="lg">
         {/* The aside column is only visible on larger screens per the layout rules. */}
@@ -40,7 +48,7 @@ function App() {
         </GridItem>
       </Show>
       <GridItem area="main">
-        <JobGrid refreshKey={refreshKey} />
+        <JobGrid refreshKey={refreshKey} searchText={searchText} />
       </GridItem>
     </Grid>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SimpleGrid, Text, useDisclosure } from "@chakra-ui/react";
 import JobCard from "./JobCard";
 import useJobs, { JobSummary } from "../hooks/useJobs";
@@ -7,9 +7,10 @@ import JobDetailsModal from "./JobDetailsModal";
 
 interface JobGridProps {
   refreshKey?: number;
+  searchText?: string;
 }
 
-const JobGrid = ({ refreshKey = 0 }: JobGridProps) => {
+const JobGrid = ({ refreshKey = 0, searchText = "" }: JobGridProps) => {
   // refreshKey is bumped by the parent whenever a new job gets created.
   const { jobs, error, isLoading } = useJobs(refreshKey);
   const skeletons = [1, 2, 3, 4, 5];
@@ -30,9 +31,19 @@ const JobGrid = ({ refreshKey = 0 }: JobGridProps) => {
     setSelectedJobId(null);
   };
 
+  const filteredJobs = useMemo(() => {
+    if (!searchText.trim()) return jobs;
+    const term = searchText.toLowerCase();
+    return jobs.filter(({ title, company, location, description }) =>
+      [title, company, location, description]
+        .filter(Boolean)
+        .some((field) => field!.toLowerCase().includes(term))
+    );
+  }, [jobs, searchText]);
+
   return (
     <>
-      {error && <Text>{error}</Text>}
+      {error && <Text paddingX="20px">{error}</Text>}
       <SimpleGrid
         columns={{ sm: 1, md: 2, lg: 3, xl: 4, "2xl": 5 }}
         padding="20px"
@@ -40,7 +51,7 @@ const JobGrid = ({ refreshKey = 0 }: JobGridProps) => {
       >
         {isLoading &&
           skeletons.map((skeleton) => <JobCardSkeleton key={skeleton} />)}
-        {jobs.map((job) => (
+        {filteredJobs.map((job) => (
           <JobCard key={job.id} job={job} onSelect={handleJobSelect} />
         ))}
       </SimpleGrid>
