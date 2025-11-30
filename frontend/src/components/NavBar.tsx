@@ -1,4 +1,5 @@
-import { Box, Flex, Image } from "@chakra-ui/react";
+import { Box, Flex, IconButton, Image, Show } from "@chakra-ui/react";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import logo from "../assets/logo.webp";
 import ColorModeSwitch from "./ColorModeSwitch";
 import SearchInput from "./SearchInput";
@@ -6,9 +7,10 @@ import SearchInput from "./SearchInput";
 interface NavBarProps {
   searchText: string;
   onSearch: (value: string) => void;
+  onMenuClick: () => void;
 }
 
-const NavBar = ({ searchText, onSearch }: NavBarProps) => {
+const NavBar = ({ searchText, onSearch, onMenuClick }: NavBarProps) => {
   return (
     <Flex
       as="nav"
@@ -34,7 +36,17 @@ const NavBar = ({ searchText, onSearch }: NavBarProps) => {
         <SearchInput value={searchText} onSearch={onSearch} />
       </Box>
       <Box flexShrink={0}>
-        <ColorModeSwitch />
+        <Show above="lg">
+          <ColorModeSwitch />
+        </Show>
+        <Show below="lg">
+          <IconButton
+            aria-label="Open menu"
+            icon={<HamburgerIcon boxSize={5} />}
+            variant="ghost"
+            onClick={onMenuClick}
+          />
+        </Show>
       </Box>
     </Flex>
   );
