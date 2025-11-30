@@ -16,6 +16,24 @@ services:
       - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     # Seed is intentionally NOT wired automatically so it remains optional.
 
+  # Optional one-off seeding service, enabled via:
+  #   docker compose --profile seed up --build
+  db-seed:
+    profiles: ["seed"]
+    image: postgres:16
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: jobapp
+      POSTGRES_PASSWORD: jobapp
+      POSTGRES_DB: jobapp_jobs
+    volumes:
+      - ./backend/db/seed.sql:/seed.sql:ro
+    command: >
+      bash -c "
+        psql 'postgres://jobapp:jobapp@db:5432/jobapp_jobs' -f /seed.sql
+      "
+
   backend:
     build:
       context: ./backend

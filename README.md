@@ -1,22 +1,82 @@
-## jobapp Job Board – Full‑Stack Project
+## 💼 jobapp Job Board – Full‑Stack Project
+
+Nimrod Burg
+.
 
 Lightweight job board built for the jobapp project.  
 The project is split into a **Node.js + Express + PostgreSQL backend** and a **React + TypeScript + Chakra UI frontend**, following a simple layered architecture.
 
 ---
 
-## Contents
+## 📚 Contents
 
+- **Run with docker** - GO HERE TO START EASILY.
 - **Backend** – Express API, PostgreSQL integration, business logic.
 - **Frontend** – React SPA with Chakra UI, hooks-based data layer.
 - **Database** – PostgreSQL schema (`users`, `jobs`, `registrations`) and seed script.
 - **How to run** – 1–2 commands to start everything locally.
 - **Features** – Core requirements vs. implemented bonus features.
-- **Common README sections** – What a typical project README would include.
+- **What I'd add** - My ideas for the next steps.
 
 ---
 
-## Backend (`/backend`)
+## 🐳 Running everything with Docker (single command)
+
+If you prefer to run the entire stack via Docker, you can use the included `docker-compose.yml`.
+
+### Start DB + backend + frontend (no seed)
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+This will:
+
+- Start **PostgreSQL** in a container named `jobapp-postgres`.
+- Build and run the **backend** container on port `3000`.
+- Build and run the **frontend** container on port `5173`.
+
+Then open the app in your browser at:
+
+- `http://localhost:5173`
+
+The backend is available at:
+
+- `http://localhost:3000`
+
+### Optional: run with seeding (using a profile)
+
+Seeding is **opt‑in** via a Docker Compose profile.
+
+- **Without seeding** (default):
+
+  ```bash
+  docker compose up --build
+  ```
+
+- **With seeding enabled**:
+
+  ```bash
+  docker compose --profile seed up --build
+  ```
+
+  This starts the usual services (`db`, `backend`, `frontend`) and additionally runs a one‑off `db-seed` service that applies `backend/db/seed.sql`.
+
+Alternatively, from your host (with `psql` installed) you can always seed manually:
+
+```bash
+cd backend
+psql "$DATABASE_URL" -f db/init.sql
+psql "$DATABASE_URL" -f db/seed.sql
+```
+
+Both approaches keep seeding as an explicit, optional step.
+
+---
+
+## 🛠 Backend (`/backend`)
 
 **Tech stack & dependencies**
 
@@ -50,6 +110,7 @@ The project is split into a **Node.js + Express + PostgreSQL backend** and a **R
 - `POST /auth/login` – Login with email only, return JWT + user.
 
 **Environment variables**
+Must add it to your .env to run smooth
 
 - `PORT` – HTTP port (default: 3000).
 - `DATABASE_URL` – Connection string for PostgreSQL  
@@ -59,7 +120,7 @@ The project is split into a **Node.js + Express + PostgreSQL backend** and a **R
 
 ---
 
-## Frontend (`/frontend`)
+## 🎨 Frontend (`/frontend`)
 
 **Tech stack & dependencies**
 
@@ -90,7 +151,7 @@ The project is split into a **Node.js + Express + PostgreSQL backend** and a **R
 
 ---
 
-## Features
+## ✨ Features
 
 ### Required features from the requirements (implemented)
 
@@ -142,7 +203,7 @@ The project is split into a **Node.js + Express + PostgreSQL backend** and a **R
 
 ---
 
-## How to run everything locally
+## 🚀 How to run everything locally
 
 ### Prerequisites
 
@@ -196,56 +257,7 @@ The frontend expects the backend at `http://localhost:3000` (see `frontend/src/s
 
 ---
 
-## Running everything with Docker (single command)
-
-If you prefer to run the entire stack via Docker, you can use the included `docker-compose.yml`.
-
-### Start DB + backend + frontend
-
-From the project root:
-
-```bash
-docker compose up --build
-```
-
-This will:
-
-- Start **PostgreSQL** in a container named `jobapp-postgres`.
-- Build and run the **backend** container on port `3000`.
-- Build and run the **frontend** container on port `5173`.
-
-Then open the app in your browser at:
-
-- `http://localhost:5173`
-
-The backend is available at:
-
-- `http://localhost:3000`
-
-### Optional: seeding the database when using Docker
-
-Seeding is **not automatic** so you can decide when to load sample data.
-
-After `docker compose up` has started the containers, run:
-
-```bash
-docker compose exec db psql "postgres://jobapp:jobapp@localhost:5432/jobapp_jobs" -f /docker-entrypoint-initdb.d/01-init.sql
-docker compose exec db psql "postgres://jobapp:jobapp@localhost:5432/jobapp_jobs" -f /app/backend/db/seed.sql
-```
-
-Alternatively, from your host (with `psql` installed) you can run:
-
-```bash
-cd backend
-psql "$DATABASE_URL" -f db/init.sql
-psql "$DATABASE_URL" -f db/seed.sql
-```
-
-Both approaches keep seeding as an explicit, optional step.
-
----
-
-## Database seed script
+## 🌱 Database seed script
 
 The project uses a simple SQL-based seeding approach so you can quickly load meaningful demo data.
 
@@ -302,3 +314,12 @@ This approach keeps the seed script in sync with your “real” development dat
 - **Hooks-based frontend** – Custom React hooks encapsulate data fetching and side effects; components stay focused on UI.
 - **Chakra UI** – Provides accessible, responsive building blocks with minimal custom CSS, ideal for fast iteration on UI.
 - **Lightweight auth** – Email-only signup/login with JWTs to support job ownership and owner-only actions without overcomplicating the Project.
+
+## What I'd add:
+
+There are endless options, but just for starters i'd add:
+
+- **Ownership indication on jobs you create** - So you know what's yours in the grid, or a 'Manage Jobs' button, and the ability to delete what you created. -**Genres of jobs on the aside menu** - Under the log in button there's plenty of room for that. e.g. Stadiums, Concerts, Festivals, Conferences, Corportates -**Icons of employment type** - I'd add small icons and the ability to sort by them. e.g. Medic, Security, Food/Kitchen, Bar, Language, Customer Service, Driving License. -**Reviews** - I'd add a score to companies based on what previous employeed users rated them after the job was done. -**Specific times of employment & payment** - For obvious reasons, users first of all care about this information.
+
+And much more..
+:)
