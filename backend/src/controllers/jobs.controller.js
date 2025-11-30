@@ -2,6 +2,7 @@
 // Handles HTTP requests/responses and delegates to the service layer.
 
 const jobsService = require('../services/jobs.service');
+const { validate, schemas } = require('../validation');
 
 // GET /jobs
 async function getAllJobs(req,res){
@@ -17,7 +18,11 @@ async function getAllJobs(req,res){
 
 // GET /jobs/:id
 async function getJobById(req, res){
-    const jobId = req.params.id;
+    const { value: params, error } = validate(schemas.jobIdParam, req.params);
+    if (error) {
+        return res.status(400).json({error});
+    }
+    const jobId = params.id;
 
     try {
         const job = await jobsService.getJobWithRegistrations(jobId);
@@ -35,13 +40,13 @@ async function getJobById(req, res){
 
 // POST /jobs
 async function createJob(req, res){
-    const { title, company, location, description } = req.body;
+    const { value, error } = validate(schemas.createJob, req.body);
+    if (error) {
+        return res.status(400).json({error});
+    }
+    const { title, company, location, description } = value;
     const ownerUserId = req.user?.id;
 
-    // Basic validation according to API logic
-    if (!title || !company) {
-        return res.status(400).json({error: 'Job title and company name are required'});
-    }
     if (!ownerUserId) {
         return res.status(401).json({error: 'Authentication is required to create jobs'});
     }
@@ -63,12 +68,17 @@ async function createJob(req, res){
 
 // POST /jobs/:id/registrations
 async function addRegistration(req, res){
-    const jobId = req.params.id;
-    const { email } = req.body;
-
-    if (!email) {
-        return res.status(400).json({error: 'Email is required'});
+    const { value: params, error: paramsError } = validate(schemas.jobIdParam, req.params);
+    if (paramsError) {
+        return res.status(400).json({error: paramsError});
     }
+    const jobId = params.id;
+    const { value, error } = validate(schemas.registration, req.body);
+    if (error) {
+        return res.status(400).json({error});
+    }
+    const { email } = value;
+
     try {
         const result = await jobsService.addRegistration(jobId, email);
         
@@ -93,16 +103,20 @@ async function addRegistration(req, res){
 
 // DELETE /jobs/:id/registrations
 async function removeRegistration(req, res){
-    const jobId = req.params.id;
-    const { email } = req.body;
+    const { value: params, error: paramsError } = validate(schemas.jobIdParam, req.params);
+    if (paramsError) {
+        return res.status(400).json({error: paramsError});
+    }
+    const jobId = params.id;
+    const { value, error } = validate(schemas.registration, req.body);
+    if (error) {
+        return res.status(400).json({error});
+    }
+    const { email } = value;
     const ownerUserId = req.user?.id;
 
     if (!ownerUserId) {
         return res.status(401).json({error: 'Authentication is required'});
-    }
-
-    if (!email) {
-        return res.status(400).json({error: 'Email is required'});
     }
 
     try {

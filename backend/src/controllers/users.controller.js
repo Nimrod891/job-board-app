@@ -2,14 +2,15 @@
 // Handles HTTP concerns for user resources.
 
 const usersService = require('../services/users.service');
+const { validate, schemas } = require('../validation');
 
 // POST /users
 async function createUser(req, res) {
-  const { email, name } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+  const { value, error } = validate(schemas.userCreation, req.body);
+  if (error) {
+    return res.status(400).json({ error });
   }
+  const { email, name } = value;
 
   try {
     const user = await usersService.createUser({ email, name });

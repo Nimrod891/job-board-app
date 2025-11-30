@@ -3,14 +3,15 @@
 
 const usersService = require('../services/users.service');
 const authService = require('../services/auth.service');
+const { validate, schemas } = require('../validation');
 
 // POST /auth/signup
 async function signup(req, res) {
-  const { email, name } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+  const { value, error } = validate(schemas.signup, req.body);
+  if (error) {
+    return res.status(400).json({ error });
   }
+  const { email, name } = value;
 
   try {
     const existing = await usersService.getUserByEmail(email);
@@ -30,11 +31,11 @@ async function signup(req, res) {
 
 // POST /auth/login
 async function login(req, res) {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+  const { value, error } = validate(schemas.login, req.body);
+  if (error) {
+    return res.status(400).json({ error });
   }
+  const { email } = value;
 
   try {
     const user = await usersService.getUserByEmail(email);
