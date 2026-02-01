@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 import { Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
-import { BsSearch } from "react-icons/bs";
+import { SearchIcon } from "@chakra-ui/icons";
 
 interface SearchInputProps {
   value: string;
@@ -13,7 +13,10 @@ const SearchInput = ({ value, onSearch }: SearchInputProps) => {
 
   return (
     <InputGroup maxW={{ base: "100%", md: "480px" }} width="100%">
-      <InputLeftElement pointerEvents="none" children={<BsSearch />} />
+      <InputLeftElement pointerEvents="none">
+        <SearchIcon />
+      </InputLeftElement>
+
       <Input
         value={value}
         onChange={handleChange}

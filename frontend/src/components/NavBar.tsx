@@ -23,7 +23,7 @@ const NavBar = ({ searchText, onSearch, onMenuClick }: NavBarProps) => {
       <Image
         src={logo}
         boxSize="52px"
-        borderRadius={10}
+        borderRadius={0}
         overflow="hidden"
         flexShrink={0}
       />
